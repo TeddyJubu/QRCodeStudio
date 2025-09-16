@@ -1,0 +1,81 @@
+🤖 Prompt for Replit AI
+Create a comprehensive, browser-based QR Code Generator web application using HTML, CSS, and JavaScript. The application should have a clean, modern, and responsive user interface.
+
+The UI should be split into two main sections: a control panel on the left for user inputs and customization, and a live preview area on the right that instantly updates the QR code as changes are made.
+
+Here is a step-by-step breakdown of the required features:
+
+Step 1: Basic Structure and UI Layout
+HTML: Create a index.html file with a main container. Inside, set up a two-column layout.
+
+Left Column (Controls): This will contain all the input fields, sliders, color pickers, and buttons. Group them into logical sections like "Content," "Colors," "Logo," and "Style."
+
+Right Column (Preview): This will have a dedicated div where the generated QR code will be rendered in real-time. Below the QR code, add download buttons.
+
+CSS: Use a modern CSS framework like Tailwind CSS for styling to ensure the app is responsive and looks professional. Style all input elements for a consistent look and feel.
+
+Step 2: Core QR Code Generation
+JavaScript: Use the qr-code-styling JavaScript library to handle the generation and customization of the QR code. This is crucial for implementing the advanced styling features.
+
+Initialize a new QR code instance tied to the preview div in the right column.
+
+Create a primary input field for the URL or text. The QR code in the preview area must update automatically as the user types in this field.
+
+Step 3: Advanced Content Types
+Implement a tabbed interface or a dropdown menu in the control panel to allow users to generate QR codes for different data types beyond just a URL. Include support for:
+
+Text: Simple plain text.
+
+WiFi: Inputs for SSID (Network Name), Password, and Encryption Type (WPA/WPA2, WEP, None).
+
+vCard: Fields for First Name, Last Name, Phone, and Email to create a contact card.
+
+Email: Inputs for recipient's email, subject, and body.
+
+Step 4: Customization Features
+This is the most important part. Implement the following customization options, ensuring each change is reflected instantly in the live preview.
+
+Colors:
+
+Provide two color pickers: one for the dots (foreground) and one for the background.
+
+Add an option to use a gradient for the dots, with inputs for the two gradient colors and rotation angle.
+
+Logo Integration:
+
+Include a file input (<input type="file">) that allows users to upload an image (e.g., a logo) to be placed in the center of the QR code.
+
+Add a slider or input to control the margin/padding around the logo so it doesn't obscure the QR code's data.
+
+Dot and Corner Styling:
+
+Create dropdown menus to change the style of the QR code's modules:
+
+Dot Style: Options for Square, Dots, Rounded, Extra-rounded, Classy.
+
+Corner Square Style: Options for Square, Dot, Extra-rounded.
+
+Corner Dot Style: Options for Square, Dot.
+
+Step 5: Download Functionality
+Below the QR code preview, add download buttons for the following formats:
+
+PNG
+
+JPEG
+
+SVG
+
+Implement the JavaScript functions to trigger the download of the generated QR code in the selected format using the methods provided by the qr-code-styling library.
+
+🧑‍💻 Recommended Tech Stack
+Here's the ideal and straightforward tech stack for building this application on Replit. This stack is entirely client-side, meaning it runs completely in the user's browser, making it fast and easy to deploy.
+
+Frontend (The Core App)
+HTML: The standard for structuring the web page content.
+
+Tailwind CSS: A utility-first CSS framework perfect for rapidly building modern, responsive designs without writing a lot of custom CSS. It's an excellent choice for creating the clean UI described in the prompt.
+
+JavaScript (Vanilla): The programming language to handle all the logic, user interactions, and dynamic updates. No complex frameworks like React or Vue are necessary, which keeps the project lightweight.
+
+qr-code-styling Library: This is the key dependency. It's a powerful open-source library that handles not just QR code generation but also all the advanced styling features like colors, gradients, logos, and dot shapes right out of the box. It makes implementing the "interesting features" significantly easier.
