@@ -13,7 +13,7 @@ export const users = pgTable("users", {
 
 export const qrCodes = pgTable("qr_codes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   data: text("data").notNull(),
   contentType: text("content_type").notNull(), // 'url', 'text', 'wifi', 'vcard', 'email'
@@ -24,7 +24,7 @@ export const qrCodes = pgTable("qr_codes", {
 
 export const templates = pgTable("templates", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
   name: text("name").notNull(),
   description: text("description"),
   options: jsonb("options").notNull(), // QR styling options template
@@ -86,29 +86,57 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertQrCodeSchema = createInsertSchema(qrCodes).omit({
   id: true,
+  userId: true, // Server will set this based on authentication
   createdAt: true,
   updatedAt: true,
 });
 
+export const updateQrCodeSchema = createInsertSchema(qrCodes).omit({
+  id: true,
+  userId: true, // Cannot change ownership
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
 export const insertTemplateSchema = createInsertSchema(templates).omit({
   id: true,
+  userId: true, // Server will set this based on authentication
   createdAt: true,
   updatedAt: true,
   usageCount: true,
 });
 
+export const updateTemplateSchema = createInsertSchema(templates).omit({
+  id: true,
+  userId: true, // Cannot change ownership
+  createdAt: true,
+  updatedAt: true,
+  usageCount: true,
+}).partial();
+
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
   id: true,
+  userId: true, // Server will set this based on authentication
   createdAt: true,
   updatedAt: true,
 });
+
+export const updateUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  userId: true, // Cannot change ownership
+  createdAt: true,
+  updatedAt: true,
+}).partial();
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type QrCode = typeof qrCodes.$inferSelect;
 export type InsertQrCode = z.infer<typeof insertQrCodeSchema>;
+export type UpdateQrCode = z.infer<typeof updateQrCodeSchema>;
 export type Template = typeof templates.$inferSelect;
 export type InsertTemplate = z.infer<typeof insertTemplateSchema>;
+export type UpdateTemplate = z.infer<typeof updateTemplateSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type UpdateUserPreferences = z.infer<typeof updateUserPreferencesSchema>;
