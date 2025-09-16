@@ -2,6 +2,9 @@ import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import QRCodePreview, { QRCodeOptions } from '@/components/QRCodePreview';
 import QRCodeControls from '@/components/QRCodeControls';
+import QRHistory from '@/components/QRHistory';
+import QRTemplates from '@/components/QRTemplates';
+import UserPreferences from '@/components/UserPreferences';
 import ThemeToggle from '@/components/ThemeToggle';
 import { QrCode } from 'lucide-react';
 
@@ -41,6 +44,14 @@ export default function Home() {
     });
   }, [toast]);
 
+  const handleLoadOptions = useCallback((newOptions: QRCodeOptions) => {
+    setQrOptions(newOptions);
+    toast({
+      title: 'QR Code Loaded',
+      description: 'The QR code configuration has been applied.',
+    });
+  }, [toast]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -56,7 +67,18 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">Create custom QR codes instantly</p>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <QRHistory 
+                currentOptions={qrOptions}
+                onLoadOptions={handleLoadOptions}
+              />
+              <QRTemplates 
+                currentOptions={qrOptions}
+                onLoadOptions={handleLoadOptions}
+              />
+              <UserPreferences />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
