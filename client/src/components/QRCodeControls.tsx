@@ -76,13 +76,14 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
   // Function to generate preview redirect URL for dynamic QRs
   const generatePreviewRedirect = async (destination: string): Promise<string> => {
     try {
-      const response = await apiRequest({
-        endpoint: '/api/qr-codes/preview-redirect',
-        method: 'POST',
-        body: { destinationUrl: destination }
-      });
+      const response = await apiRequest(
+        'POST',
+        '/api/qr-codes/preview-redirect',
+        { destinationUrl: destination }
+      );
       
-      return response.redirectUrl;
+      const data = await response.json();
+      return data.redirectUrl;
     } catch (error) {
       console.error('Failed to generate preview redirect:', error);
       // Fallback to a placeholder if API fails

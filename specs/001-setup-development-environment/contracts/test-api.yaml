@@ -1,0 +1,498 @@
+openapi: 3.0.0
+info:
+  title: Development Environment Test API
+  description: API endpoints for testing development environment setup
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3001/api
+    description: Development server
+
+paths:
+  /tests:
+    get:
+      summary: Get all test suites
+      description: Retrieve information about all configured test suites
+      tags:
+        - Testing
+      responses:
+        '200':
+          description: List of test suites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestSuite'
+        '500':
+          description: Internal server error
+
+  /tests/run:
+    post:
+      summary: Run test suite
+      description: Execute specified test suite
+      tags:
+        - Testing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                suite:
+                  type: string
+                  enum: [unit, integration, e2e]
+                  description: Type of test suite to run
+                coverage:
+                  type: boolean
+                  description: Whether to generate coverage report
+      responses:
+        '200':
+          description: Test execution results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestExecution'
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Test execution failed
+
+  /quality:
+    get:
+      summary: Get code quality status
+      description: Retrieve current code quality metrics and status
+      tags:
+        - Code Quality
+      responses:
+        '200':
+          description: Code quality status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualityStatus'
+        '500':
+          description: Internal server error
+
+  /quality/lint:
+    post:
+      summary: Run linting
+      description: Execute code quality linting checks
+      tags:
+        - Code Quality
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fix:
+                  type: boolean
+                  description: Whether to auto-fix issues
+                files:
+                  type: array
+                  items:
+                    type: string
+                  description: Specific files to lint (empty for all)
+      responses:
+        '200':
+          description: Linting results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LintingResult'
+        '500':
+          description: Linting failed
+
+  /performance:
+    get:
+      summary: Get performance metrics
+      description: Retrieve current performance metrics and status
+      tags:
+        - Performance
+      responses:
+        '200':
+          description: Performance metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceMetrics'
+        '500':
+          description: Internal server error
+
+  /performance/audit:
+    post:
+      summary: Run performance audit
+      description: Execute comprehensive performance audit
+      tags:
+        - Performance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [lighthouse, web-vitals, bundle]
+                  description: Type of performance audit to run
+      responses:
+        '200':
+          description: Performance audit results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceAudit'
+        '500':
+          description: Performance audit failed
+
+  /ci/status:
+    get:
+      summary: Get CI/CD status
+      description: Retrieve current CI/CD pipeline status
+      tags:
+        - CI/CD
+      responses:
+        '200':
+          description: CI/CD status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CICDStatus'
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    TestSuite:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "unit-tests"
+        name:
+          type: string
+          example: "Unit Tests"
+        type:
+          type: string
+          enum: [unit, integration, e2e]
+          example: "unit"
+        framework:
+          type: string
+          example: "vitest"
+        configPath:
+          type: string
+          example: "vitest.config.ts"
+        coverageTarget:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 80
+        status:
+          type: string
+          enum: [passing, failing, pending]
+          example: "passing"
+
+    TestExecution:
+      type: object
+      properties:
+        suite:
+          type: string
+          example: "unit"
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        duration:
+          type: number
+          example: 2500
+        totalTests:
+          type: integer
+          example: 42
+        passedTests:
+          type: integer
+          example: 40
+        failedTests:
+          type: integer
+          example: 2
+        skippedTests:
+          type: integer
+          example: 0
+        coverage:
+          type: object
+          properties:
+            percentage:
+              type: number
+              example: 85.5
+            lines:
+              type: object
+              properties:
+                total:
+                  type: integer
+                  example: 1000
+                covered:
+                  type: integer
+                  example: 855
+            functions:
+              type: object
+              properties:
+                total:
+                  type: integer
+                  example: 50
+                covered:
+                  type: integer
+                  example: 43
+            branches:
+              type: object
+              properties:
+                total:
+                  type: integer
+                  example: 200
+                covered:
+                  type: integer
+                  example: 170
+            statements:
+              type: object
+              properties:
+                total:
+                  type: integer
+                  example: 1200
+                covered:
+                  type: integer
+                  example: 1026
+
+    QualityStatus:
+      type: object
+      properties:
+        overall:
+          type: string
+          enum: [passing, warning, failing]
+          example: "passing"
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolStatus'
+        lastChecked:
+          type: string
+          format: date-time
+
+    ToolStatus:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "ESLint"
+        type:
+          type: string
+          enum: [linter, formatter, type-checker]
+          example: "linter"
+        status:
+          type: string
+          enum: [passing, warning, failing]
+          example: "passing"
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/QualityIssue'
+
+    QualityIssue:
+      type: object
+      properties:
+        file:
+          type: string
+          example: "src/components/QRCodeControls.tsx"
+        line:
+          type: integer
+          example: 25
+        column:
+          type: integer
+          example: 10
+        rule:
+          type: string
+          example: "react-hooks/exhaustive-deps"
+        message:
+          type: string
+          example: "React Hook useEffect has missing dependencies"
+        severity:
+          type: string
+          enum: [error, warning]
+          example: "warning"
+
+    LintingResult:
+      type: object
+      properties:
+        fixed:
+          type: integer
+          example: 5
+        remaining:
+          type: integer
+          example: 2
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/QualityIssue'
+        executionTime:
+          type: number
+          example: 1200
+
+    PerformanceMetrics:
+      type: object
+      properties:
+        lcp:
+          $ref: '#/components/schemas/PerformanceMetric'
+        fid:
+          $ref: '#/components/schemas/PerformanceMetric'
+        cls:
+          $ref: '#/components/schemas/PerformanceMetric'
+        bundleSize:
+          $ref: '#/components/schemas/PerformanceMetric'
+        loadTime:
+          $ref: '#/components/schemas/PerformanceMetric'
+
+    PerformanceMetric:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "LCP"
+        value:
+          type: number
+          example: 2.5
+        unit:
+          type: string
+          example: "seconds"
+        target:
+          type: number
+          example: 2.5
+        threshold:
+          type: number
+          example: 4.0
+        status:
+          type: string
+          enum: [good, needs-improvement, poor]
+          example: "good"
+
+    PerformanceAudit:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [lighthouse, web-vitals, bundle]
+          example: "lighthouse"
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 92
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditCategory'
+        opportunities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditOpportunity'
+        diagnostics:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditDiagnostic'
+
+    AuditCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "performance"
+        title:
+          type: string
+          example: "Performance"
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 95
+
+    AuditOpportunity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Reduce initial server response time"
+        description:
+          type: string
+          example: "The server responded slowly to the initial request"
+        savings:
+          type: object
+          properties:
+            ms:
+              type: number
+              example: 1200
+            bytes:
+              type: integer
+              example: 50000
+
+    AuditDiagnostic:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Ensure text remains visible during webfont load"
+        description:
+          type: string
+          example: "Font display strategies ensure text remains visible"
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+          example: 1
+
+    CICDStatus:
+      type: object
+      properties:
+        overall:
+          type: string
+          enum: [healthy, degraded, failed]
+          example: "healthy"
+        workflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStatus'
+        lastUpdate:
+          type: string
+          format: date-time
+
+    WorkflowStatus:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Test"
+        status:
+          type: string
+          enum: [success, failure, pending, running]
+          example: "success"
+        lastRun:
+          type: string
+          format: date-time
+        duration:
+          type: number
+          example: 300000
+        url:
+          type: string
+          format: uri
+          example: "https://github.com/owner/repo/actions/runs/123456789"
+
+tags:
+  - name: Testing
+    description: Test suite management and execution
+  - name: Code Quality
+    description: Code quality checks and linting
+  - name: Performance
+    description: Performance monitoring and auditing
+  - name: CI/CD
+    description: Continuous integration and deployment status
