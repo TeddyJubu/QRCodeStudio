@@ -3,9 +3,15 @@
 
 echo "🔍 Running pre-commit hooks..."
 
-# Run lint-staged
-echo "📝 Running lint-staged..."
-npx lint-staged
+# Run secret detection first
+echo "🔐 Running secret detection..."
+node scripts/secret-detection.js
+
+# Run lint-staged if no secret issues
+if [ $? -eq 0 ]; then
+  echo "📝 Running lint-staged..."
+  npx lint-staged
+fi
 
 # Run type check if no lint-staged errors
 if [ $? -eq 0 ]; then

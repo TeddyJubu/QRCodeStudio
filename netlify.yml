@@ -1,0 +1,13 @@
+build:
+  command: npm run build:client
+  publish: dist/public
+  environment:
+    NODE_VERSION: '20'
+
+redirects:
+  - from: /api/*
+    to: /api-placeholder.html
+    status: 200
+  - from: /*
+    to: /index.html
+    status: 200

@@ -1,16 +1,3 @@
 [build]
   command = "npm run build:client"
   publish = "dist/public"
-
-[build.environment]
-  NODE_VERSION = "20"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/api-placeholder.html"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
