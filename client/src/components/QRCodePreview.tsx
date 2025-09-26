@@ -34,6 +34,9 @@ export interface QRCodeOptions {
     margin: number;
   };
   image?: string;
+  // Dynamic QR code fields
+  isDynamic?: boolean;
+  destinationUrl?: string;
 }
 
 interface QRCodePreviewProps {

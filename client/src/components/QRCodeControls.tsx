@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, Upload, X } from 'lucide-react';
 import type { QRCodeOptions } from './QRCodePreview';
+import { apiRequest } from '@/lib/queryClient';
 
 interface QRCodeControlsProps {
   options: QRCodeOptions;
@@ -24,6 +25,17 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
   const [useGradient, setUseGradient] = useState(false);
   const [stylingOpen, setStylingOpen] = useState(true);
   const [logoOpen, setLogoOpen] = useState(false);
+  
+  // Dynamic QR state
+  const [isDynamic, setIsDynamic] = useState(options.isDynamic || false);
+  const [destinationUrl, setDestinationUrl] = useState(options.destinationUrl || '');
+  const [previewRedirectUrl, setPreviewRedirectUrl] = useState<string>('');
+
+  // Sync local state with parent options when options change
+  useEffect(() => {
+    setIsDynamic(options.isDynamic || false);
+    setDestinationUrl(options.destinationUrl || '');
+  }, [options.isDynamic, options.destinationUrl]);
   
   // Content form states
   const [urlText, setUrlText] = useState('https://example.com');
@@ -61,9 +73,78 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     }
   };
 
-  const updateQRData = () => {
-    const newData = generateQRData();
-    onOptionsChange({ ...options, data: newData });
+  // Function to generate preview redirect URL for dynamic QRs
+  const generatePreviewRedirect = async (destination: string): Promise<string> => {
+    try {
+      const response = await apiRequest({
+        endpoint: '/api/qr-codes/preview-redirect',
+        method: 'POST',
+        body: { destinationUrl: destination }
+      });
+      
+      return response.redirectUrl;
+    } catch (error) {
+      console.error('Failed to generate preview redirect:', error);
+      // Fallback to a placeholder if API fails
+      return `https://example.com/r/preview-${Date.now()}`;
+    }
+  };
+
+  const updateQRData = async (explicitIsDynamic?: boolean, explicitDestinationUrl?: string) => {
+    // Use explicit parameters if provided, otherwise fall back to current state
+    const currentIsDynamic = explicitIsDynamic !== undefined ? explicitIsDynamic : isDynamic;
+    const currentDestinationUrl = explicitDestinationUrl !== undefined ? explicitDestinationUrl : destinationUrl;
+    
+    let qrData;
+    
+    if (currentIsDynamic && currentDestinationUrl) {
+      // For dynamic QRs, get a real preview redirect URL from backend
+      if (!previewRedirectUrl || explicitDestinationUrl !== undefined) {
+        qrData = await generatePreviewRedirect(currentDestinationUrl);
+        setPreviewRedirectUrl(qrData);
+      } else {
+        qrData = previewRedirectUrl;
+      }
+    } else {
+      // For static QRs, use the actual content
+      qrData = generateQRData();
+      setPreviewRedirectUrl(''); // Clear preview redirect URL for static QRs
+    }
+    
+    onOptionsChange({ 
+      ...options, 
+      data: qrData,
+      isDynamic: currentIsDynamic,
+      destinationUrl: currentIsDynamic ? currentDestinationUrl : undefined
+    });
+  };
+
+  // Handler for dynamic QR toggle
+  const handleDynamicToggle = async (checked: boolean) => {
+    setIsDynamic(checked);
+    if (checked) {
+      // When enabling dynamic mode, use current URL as destination if not already set
+      if (!destinationUrl) {
+        setDestinationUrl(generateQRData());
+      }
+    } else {
+      // When disabling dynamic mode, clear destination URL and preview redirect
+      setDestinationUrl('');
+      setPreviewRedirectUrl('');
+    }
+    // Update QR data immediately with async support
+    await updateQRData();
+  };
+
+  // Handler for destination URL changes
+  const handleDestinationUrlChange = (value: string) => {
+    setDestinationUrl(value);
+    // Clear preview redirect URL when destination changes to force new API call
+    setPreviewRedirectUrl('');
+    // Update with delay to avoid too many API calls
+    setTimeout(async () => {
+      await updateQRData();
+    }, 100);
   };
 
   const updateColor = (path: string, value: string) => {
@@ -134,7 +215,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     }
     
     // Update with a small delay to avoid too many updates
-    setTimeout(updateQRData, 100);
+    setTimeout(async () => {
+      await updateQRData();
+    }, 100);
   };
 
   return (
@@ -147,7 +230,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
         <CardContent className="space-y-4">
           <Tabs value={contentType} onValueChange={(value) => {
             setContentType(value as ContentType);
-            setTimeout(updateQRData, 100);
+            setTimeout(async () => {
+              await updateQRData();
+            }, 100);
           }}>
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="url" data-testid="tab-url">URL</TabsTrigger>
@@ -156,6 +241,44 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
               <TabsTrigger value="vcard" data-testid="tab-vcard">vCard</TabsTrigger>
               <TabsTrigger value="email" data-testid="tab-email">Email</TabsTrigger>
             </TabsList>
+            
+            {/* Dynamic QR Toggle - only show for URL content type */}
+            {contentType === 'url' && (
+              <div className="border rounded-lg p-4 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="dynamic-toggle" className="font-medium">
+                      Dynamic QR Code
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Create a dynamic QR code that you can update later without reprinting
+                    </p>
+                  </div>
+                  <Switch
+                    id="dynamic-toggle"
+                    checked={isDynamic}
+                    onCheckedChange={handleDynamicToggle}
+                    data-testid="switch-dynamic"
+                  />
+                </div>
+                
+                {isDynamic && (
+                  <div className="mt-4 space-y-2">
+                    <Label htmlFor="destination-url">Destination URL</Label>
+                    <Input
+                      id="destination-url"
+                      placeholder="https://example.com"
+                      value={destinationUrl}
+                      onChange={(e) => handleDestinationUrlChange(e.target.value)}
+                      data-testid="input-destination-url"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This is where the QR code will redirect. You can update this later without changing the QR code.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
             
             <TabsContent value="url" className="space-y-2">
               <Label htmlFor="url-input">Website URL</Label>

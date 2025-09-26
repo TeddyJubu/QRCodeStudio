@@ -36,6 +36,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // TODO: Replace with real authentication once implemented
   const getMockUserId = (): string => "demo-user-id";
 
+  // Preview redirect URL generation for dynamic QRs
+  app.post("/api/qr-codes/preview-redirect", async (req, res) => {
+    try {
+      const { destinationUrl } = req.body;
+      
+      if (!destinationUrl || typeof destinationUrl !== 'string') {
+        return res.status(400).json({ error: "destinationUrl is required" });
+      }
+      
+      // Generate a temporary redirect URL for preview purposes
+      const shortUrl = await generateShortUrl(storage);
+      const redirectUrl = `${req.protocol}://${req.get('host')}/r/${shortUrl}`;
+      
+      res.json({ 
+        redirectUrl,
+        shortUrl,
+        destinationUrl 
+      });
+    } catch (error) {
+      console.error("Error generating preview redirect:", error);
+      res.status(500).json({ error: "Failed to generate preview redirect" });
+    }
+  });
+
   // Dynamic QR Code redirect route
   app.get("/r/:shortUrl", async (req, res) => {
     try {
