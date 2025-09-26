@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, type IStorage } from "./storage";
 import { 
   insertQrCodeSchema, 
   updateQrCodeSchema,
@@ -10,6 +10,27 @@ import {
   updateUserPreferencesSchema
 } from "@shared/schema";
 import { z } from "zod";
+
+// Helper function to generate a unique short URL slug
+async function generateShortUrl(storageInstance: IStorage): Promise<string> {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  // Try up to 10 times to find a unique short URL
+  for (let attempts = 0; attempts < 10; attempts++) {
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    // Check if this shortUrl is already taken
+    const existingQrCode = await storageInstance.getQrCodeByShortUrl(result);
+    if (!existingQrCode) {
+      return result;
+    }
+  }
+  
+  throw new Error('Failed to generate unique short URL after 10 attempts');
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // TODO: Replace with real authentication once implemented
@@ -49,8 +70,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getMockUserId(); // TODO: Get from authentication
       const qrCodeData = insertQrCodeSchema.parse(req.body);
-      const qrCode = await storage.createQrCode(userId, qrCodeData);
-      res.status(201).json(qrCode);
+      
+      // Handle dynamic QR codes
+      if (qrCodeData.isDynamic) {
+        // Generate a unique short URL slug
+        const shortUrl = await generateShortUrl(storage);
+        
+        // Build the full redirect URL that will be encoded in the QR
+        const redirectUrl = `${req.protocol}://${req.get('host')}/r/${shortUrl}`;
+        
+        // For dynamic QRs, create a clean object with the redirect URL as data
+        const dynamicQrCodeData = {
+          ...qrCodeData,
+          data: redirectUrl, // QR code contains redirect URL
+        };
+        
+        // Pass the shortUrl separately to storage
+        const qrCode = await storage.createQrCode(userId, dynamicQrCodeData, shortUrl);
+        res.status(201).json(qrCode);
+      } else {
+        // Static QR code - use data as provided
+        const qrCode = await storage.createQrCode(userId, qrCodeData);
+        res.status(201).json(qrCode);
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Invalid data", details: error.errors });

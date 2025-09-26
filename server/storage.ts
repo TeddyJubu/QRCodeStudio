@@ -25,7 +25,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
 
   // QR Code methods
-  createQrCode(userId: string, qrCode: InsertQrCode): Promise<QrCode>;
+  createQrCode(userId: string, qrCode: InsertQrCode, shortUrl?: string): Promise<QrCode>;
   getQrCodesByUser(userId: string): Promise<QrCode[]>;
   getQrCode(id: string, userId: string): Promise<QrCode | undefined>;
   getQrCodeByShortUrl(shortUrl: string): Promise<QrCode | undefined>;
@@ -69,12 +69,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // QR Code methods
-  async createQrCode(userId: string, qrCode: InsertQrCode): Promise<QrCode> {
+  async createQrCode(userId: string, qrCode: InsertQrCode, shortUrl?: string): Promise<QrCode> {
     const [newQrCode] = await db
       .insert(qrCodes)
       .values({
         ...qrCode,
         userId,
+        shortUrl: shortUrl || null,
         updatedAt: new Date()
       })
       .returning();
