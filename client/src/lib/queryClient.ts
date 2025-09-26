@@ -12,6 +12,20 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined
 ): Promise<Response> {
+  // For static deployment, return a mock response for API requests
+  if (import.meta.env.PROD && url.startsWith('/api/')) {
+    return new Response(
+      JSON.stringify({
+        message: 'API not available in static deployment',
+        demo: true,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
   const res = await fetch(url, {
     method,
     headers: data ? { 'Content-Type': 'application/json' } : {},
@@ -27,7 +41,18 @@ type UnauthorizedBehavior = 'returnNull' | 'throw';
 export const getQueryFn: <T>(options: { on401: UnauthorizedBehavior }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join('/') as string, {
+    const url = queryKey.join('/') as string;
+
+    // For static deployment, return mock data for API requests
+    if (import.meta.env.PROD && url.startsWith('/api/')) {
+      return {
+        data: [],
+        message: 'API not available in static deployment',
+        demo: true,
+      };
+    }
+
+    const res = await fetch(url, {
       credentials: 'include',
     });
 
