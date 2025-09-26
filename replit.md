@@ -11,6 +11,7 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
+
 - **Framework**: React with TypeScript using Vite as the build tool
 - **UI Components**: Custom component library based on Radix UI primitives with shadcn/ui styling system
 - **Styling**: Tailwind CSS with custom CSS variables for theme support
@@ -19,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 - **Layout**: Two-column responsive design - left control panel (1/3 width) and right preview area (2/3 width)
 
 ### Backend Architecture
+
 - **Framework**: Express.js server with TypeScript
 - **Database ORM**: Drizzle ORM for type-safe database operations
 - **API Design**: RESTful API with structured route handlers
@@ -26,6 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: PostgreSQL session store with connect-pg-simple
 
 ### Data Storage Solutions
+
 - **Primary Database**: PostgreSQL with Neon serverless connection
 - **Schema Design**: Four main entities:
   - Users (authentication and profile data)
@@ -35,11 +38,13 @@ Preferred communication style: Simple, everyday language.
 - **Local Storage**: Browser localStorage for temporary persistence and theme preferences
 
 ### Authentication and Authorization
+
 - **Current State**: Mock authentication system with demo user ID
 - **Planned**: Full user authentication system (not yet implemented)
 - **Session Handling**: Prepared infrastructure using PostgreSQL session storage
 
 ### Theme and Design System
+
 - **Design Approach**: Material Design principles with utility-focused customizations
 - **Color System**: CSS custom properties with light/dark mode support
 - **Typography**: Inter font family with consistent weight distribution
@@ -49,31 +54,36 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 ### Core Libraries
+
 - **qr-code-styling**: Advanced QR code generation with styling capabilities
 - **@tanstack/react-query**: Server state management and caching
 - **wouter**: Lightweight client-side routing
 - **date-fns**: Date manipulation and formatting
 
 ### UI Component Libraries
-- **@radix-ui/***: Headless UI components for accessibility and behavior
+
+- **@radix-ui/\***: Headless UI components for accessibility and behavior
 - **lucide-react**: Icon library for consistent iconography
 - **embla-carousel-react**: Carousel functionality
 - **cmdk**: Command menu interface
 
 ### Database and Backend
+
 - **@neondatabase/serverless**: PostgreSQL serverless database connection
 - **drizzle-orm**: Type-safe database ORM
 - **drizzle-zod**: Schema validation integration
 - **connect-pg-simple**: PostgreSQL session store for Express
 
 ### Development Tools
+
 - **Vite**: Build tool and development server
-- **@replit/vite-plugin-***: Replit-specific development plugins
+- **@replit/vite-plugin-\***: Replit-specific development plugins
 - **esbuild**: JavaScript bundler for production builds
 - **Tailwind CSS**: Utility-first CSS framework
 - **PostCSS**: CSS processing with autoprefixer
 
 ### Form and Validation
+
 - **react-hook-form**: Form state management
 - **@hookform/resolvers**: Form validation resolvers
 - **zod**: TypeScript-first schema validation

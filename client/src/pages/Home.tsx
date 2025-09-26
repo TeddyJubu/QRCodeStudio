@@ -1,16 +1,25 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import QRCodePreview, { QRCodeOptions } from '@/components/QRCodePreview';
-import QRCodeControls from '@/components/QRCodeControls';
-import QRHistory from '@/components/QRHistory';
-import QRTemplates from '@/components/QRTemplates';
-import UserPreferences from '@/components/UserPreferences';
 import ThemeToggle from '@/components/ThemeToggle';
 import { QrCode } from 'lucide-react';
 
+// Lazy load heavy components
+const QRCodeControls = lazy(() => import('@/components/QRCodeControls'));
+const QRHistory = lazy(() => import('@/components/QRHistory'));
+const QRTemplates = lazy(() => import('@/components/QRTemplates'));
+const UserPreferences = lazy(() => import('@/components/UserPreferences'));
+
+// Loading component for lazy-loaded components
+const ComponentLoading = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+  </div>
+);
+
 export default function Home() {
   const { toast } = useToast();
-  
+
   const [qrOptions, setQrOptions] = useState<QRCodeOptions>({
     data: 'https://example.com',
     width: 300,
@@ -18,39 +27,45 @@ export default function Home() {
     margin: 10,
     dotsOptions: {
       color: '#6366f1',
-      type: 'square'
+      type: 'square',
     },
     backgroundOptions: {
-      color: '#ffffff'
+      color: '#ffffff',
     },
     cornersSquareOptions: {
       type: 'square',
-      color: '#6366f1'
+      color: '#6366f1',
     },
     cornersDotOptions: {
       type: 'square',
-      color: '#6366f1'
-    }
+      color: '#6366f1',
+    },
   });
 
   const handleOptionsChange = useCallback((newOptions: QRCodeOptions) => {
     setQrOptions(newOptions);
   }, []);
 
-  const handleDownload = useCallback((format: 'png' | 'jpeg' | 'svg') => {
-    toast({
-      title: 'Download Started',
-      description: `Your QR code is downloading as ${format.toUpperCase()}.`,
-    });
-  }, [toast]);
+  const handleDownload = useCallback(
+    (format: 'png' | 'jpeg' | 'svg') => {
+      toast({
+        title: 'Download Started',
+        description: `Your QR code is downloading as ${format.toUpperCase()}.`,
+      });
+    },
+    [toast]
+  );
 
-  const handleLoadOptions = useCallback((newOptions: QRCodeOptions) => {
-    setQrOptions(newOptions);
-    toast({
-      title: 'QR Code Loaded',
-      description: 'The QR code configuration has been applied.',
-    });
-  }, [toast]);
+  const handleLoadOptions = useCallback(
+    (newOptions: QRCodeOptions) => {
+      setQrOptions(newOptions);
+      toast({
+        title: 'QR Code Loaded',
+        description: 'The QR code configuration has been applied.',
+      });
+    },
+    [toast]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,15 +83,11 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <QRHistory 
-                currentOptions={qrOptions}
-                onLoadOptions={handleLoadOptions}
-              />
-              <QRTemplates 
-                currentOptions={qrOptions}
-                onLoadOptions={handleLoadOptions}
-              />
-              <UserPreferences />
+              <Suspense fallback={<ComponentLoading />}>
+                <QRHistory currentOptions={qrOptions} onLoadOptions={handleLoadOptions} />
+                <QRTemplates currentOptions={qrOptions} onLoadOptions={handleLoadOptions} />
+                <UserPreferences />
+              </Suspense>
               <ThemeToggle />
             </div>
           </div>
@@ -89,13 +100,12 @@ export default function Home() {
           {/* Left Column - Controls */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-24">
-              <QRCodeControls 
-                options={qrOptions}
-                onOptionsChange={handleOptionsChange}
-              />
+              <Suspense fallback={<ComponentLoading />}>
+                <QRCodeControls options={qrOptions} onOptionsChange={handleOptionsChange} />
+              </Suspense>
             </div>
           </div>
-          
+
           {/* Right Column - Preview */}
           <div className="lg:col-span-2">
             <div className="space-y-6">
@@ -105,11 +115,8 @@ export default function Home() {
                   Your QR code updates automatically as you make changes
                 </p>
               </div>
-              
-              <QRCodePreview 
-                options={qrOptions}
-                onDownload={handleDownload}
-              />
+
+              <QRCodePreview options={qrOptions} onDownload={handleDownload} />
             </div>
           </div>
         </div>

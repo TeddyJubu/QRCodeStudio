@@ -2,15 +2,21 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogDescription 
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings, Palette, Download, Save } from 'lucide-react';
@@ -21,7 +27,7 @@ export default function UserPreferences() {
   const { preferences, updatePreferences, isLoadingPreferences } = usePersistence();
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Local state for form values
   const [autoSave, setAutoSave] = useState(preferences?.autoSave ?? true);
   const [defaultDownloadFormat, setDefaultDownloadFormat] = useState(
@@ -45,7 +51,7 @@ export default function UserPreferences() {
       await updatePreferences({
         theme: theme,
         autoSave,
-        defaultDownloadFormat
+        defaultDownloadFormat,
       });
       setIsOpen(false);
     } catch (error) {
@@ -60,23 +66,16 @@ export default function UserPreferences() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
-          data-testid="button-user-preferences"
-        >
+        <Button variant="outline" size="sm" className="gap-2" data-testid="button-user-preferences">
           <Settings className="w-4 h-4" />
           Settings
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>User Preferences</DialogTitle>
-          <DialogDescription>
-            Customize your QR code generator experience.
-          </DialogDescription>
+          <DialogDescription>Customize your QR code generator experience.</DialogDescription>
         </DialogHeader>
 
         {isLoadingPreferences ? (
@@ -96,7 +95,9 @@ export default function UserPreferences() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="theme-select" className="text-sm">Theme</Label>
+                    <Label htmlFor="theme-select" className="text-sm">
+                      Theme
+                    </Label>
                     <Select
                       value={theme}
                       onValueChange={handleThemeChange}
@@ -126,7 +127,9 @@ export default function UserPreferences() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="format-select" className="text-sm">Default Format</Label>
+                    <Label htmlFor="format-select" className="text-sm">
+                      Default Format
+                    </Label>
                     <Select
                       value={defaultDownloadFormat}
                       onValueChange={setDefaultDownloadFormat}
@@ -157,7 +160,9 @@ export default function UserPreferences() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="auto-save" className="text-sm">Auto-save QR codes</Label>
+                    <Label htmlFor="auto-save" className="text-sm">
+                      Auto-save QR codes
+                    </Label>
                     <Switch
                       id="auto-save"
                       checked={autoSave}
@@ -178,7 +183,7 @@ export default function UserPreferences() {
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             disabled={isLoadingPreferences}
             data-testid="button-save-preferences"

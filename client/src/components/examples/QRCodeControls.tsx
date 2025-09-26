@@ -10,19 +10,19 @@ export default function QRCodeControlsExample() {
     margin: 10,
     dotsOptions: {
       color: '#6366f1',
-      type: 'square' as const
+      type: 'square' as const,
     },
     backgroundOptions: {
-      color: '#ffffff'
+      color: '#ffffff',
     },
     cornersSquareOptions: {
       type: 'square' as const,
-      color: '#6366f1'
+      color: '#6366f1',
     },
     cornersDotOptions: {
       type: 'square' as const,
-      color: '#6366f1'
-    }
+      color: '#6366f1',
+    },
   });
 
   const handleOptionsChange = (newOptions: QRCodeOptions) => {
@@ -30,10 +30,5 @@ export default function QRCodeControlsExample() {
     setOptions(newOptions);
   };
 
-  return (
-    <QRCodeControls 
-      options={options}
-      onOptionsChange={handleOptionsChange}
-    />
-  );
+  return <QRCodeControls options={options} onOptionsChange={handleOptionsChange} />;
 }

@@ -1,0 +1,20 @@
+{
+  "reporter": ["text", "lcov", "html"],
+  "exclude": [
+    "node_modules/",
+    "tests/",
+    "dist/",
+    "**/*.d.ts",
+    "**/*.config.*",
+    "**/coverage/**",
+    "client/src/main.tsx",
+    "client/src/index.css",
+    "server/index.ts"
+  ],
+  "check-coverage": true,
+  "branches": 80,
+  "functions": 80,
+  "lines": 80,
+  "statements": 80,
+  "report-dir": "coverage"
+}

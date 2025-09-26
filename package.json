@@ -25,7 +25,11 @@
     "quality": "npm run lint && npm run format:check && npm run check",
     "prepare": "husky install",
     "hooks:install": "husky install",
-    "ci:local": "npm run quality && npm run test:coverage && npm run build"
+    "ci:local": "npm run quality && npm run test:coverage && npm run build",
+    "analyze": "npm run build && open dist/public/bundle-analysis.html",
+    "audit:lighthouse": "lhci autorun",
+    "audit:performance": "npm run audit:lighthouse && npm run analyze",
+    "audit:full": "./scripts/audit-performance.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -64,6 +68,7 @@
     "cmdk": "^1.1.1",
     "connect-pg-simple": "^10.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.2.2",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
@@ -88,6 +93,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.2.5",
     "vaul": "^1.1.2",
+    "web-vitals": "^5.1.0",
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
     "zod": "^3.24.2",
@@ -96,6 +102,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.0.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@lhci/cli": "^0.12.0",
     "@playwright/test": "^1.55.1",
     "@replit/vite-plugin-cartographer": "^0.3.0",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
@@ -135,7 +142,9 @@
     "lint-staged": "^16.2.1",
     "postcss": "^8.4.47",
     "prettier": "^3.6.2",
+    "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^3.4.17",
+    "terser": "^5.44.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3",
     "vite": "^5.4.19",

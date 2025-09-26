@@ -3,16 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogDescription 
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -25,16 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
-import { 
-  History, 
-  Save, 
-  Download, 
-  Trash2, 
-  Eye, 
-  Calendar, 
-  QrCode,
-  ExternalLink 
-} from 'lucide-react';
+import { History, Save, Download, Trash2, Eye, Calendar, QrCode, ExternalLink } from 'lucide-react';
 import { usePersistence } from '@/contexts/PersistenceContext';
 import { formatDistanceToNow } from 'date-fns';
 import type { QRCodeOptions } from '@/components/QRCodePreview';
@@ -45,21 +36,16 @@ interface QRHistoryProps {
 }
 
 export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryProps) {
-  const { 
-    savedQRCodes, 
-    saveQRCode, 
-    deleteQRCode, 
-    isLoadingQRCodes 
-  } = usePersistence();
-  
+  const { savedQRCodes, saveQRCode, deleteQRCode, isLoadingQRCodes } = usePersistence();
+
   const [isOpen, setIsOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [qrName, setQrName] = useState('');
-  const [selectedQR, setSelectedQR] = useState<typeof savedQRCodes[0] | null>(null);
+  const [selectedQR, setSelectedQR] = useState<(typeof savedQRCodes)[0] | null>(null);
 
   const handleSave = async () => {
     if (!qrName.trim()) return;
-    
+
     try {
       await saveQRCode(qrName.trim(), currentOptions);
       setQrName('');
@@ -77,7 +63,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
     }
   };
 
-  const handleLoad = (qrCode: typeof savedQRCodes[0]) => {
+  const handleLoad = (qrCode: (typeof savedQRCodes)[0]) => {
     onLoadOptions(qrCode.options);
     setIsOpen(false);
   };
@@ -100,12 +86,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
       {/* Save Dialog */}
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            data-testid="button-save-qr"
-          >
+          <Button variant="outline" size="sm" className="gap-2" data-testid="button-save-qr">
             <Save className="w-4 h-4" />
             Save QR Code
           </Button>
@@ -122,9 +103,9 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
             <Input
               id="qr-name"
               value={qrName}
-              onChange={(e) => setQrName(e.target.value)}
+              onChange={e => setQrName(e.target.value)}
               placeholder="Enter a name for this QR code"
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              onKeyDown={e => e.key === 'Enter' && handleSave()}
               data-testid="input-qr-name"
             />
           </div>
@@ -132,8 +113,8 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
             <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={!qrName.trim()}
               data-testid="button-confirm-save"
             >
@@ -146,12 +127,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
       {/* History Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            data-testid="button-view-history"
-          >
+          <Button variant="outline" size="sm" className="gap-2" data-testid="button-view-history">
             <History className="w-4 h-4" />
             History ({savedQRCodes.length})
           </Button>
@@ -159,11 +135,9 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
         <DialogContent className="sm:max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>QR Code History</DialogTitle>
-            <DialogDescription>
-              View and manage your saved QR codes.
-            </DialogDescription>
+            <DialogDescription>View and manage your saved QR codes.</DialogDescription>
           </DialogHeader>
-          
+
           <ScrollArea className="h-[400px] pr-4">
             {isLoadingQRCodes ? (
               <div className="flex items-center justify-center py-8">
@@ -179,12 +153,15 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
               </div>
             ) : (
               <div className="space-y-3">
-                {savedQRCodes.map((qrCode) => (
+                {savedQRCodes.map(qrCode => (
                   <Card key={qrCode.id} className="hover-elevate">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1 flex-1">
-                          <CardTitle className="text-base" data-testid={`text-qr-name-${qrCode.id}`}>
+                          <CardTitle
+                            className="text-base"
+                            data-testid={`text-qr-name-${qrCode.id}`}
+                          >
                             {qrCode.title}
                           </CardTitle>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -207,7 +184,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
                             {getDataPreview(qrCode.data)}
                           </p>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"
@@ -218,7 +195,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
                             <ExternalLink className="w-3 h-3" />
                             Load
                           </Button>
-                          
+
                           <Button
                             size="sm"
                             variant="outline"
@@ -229,7 +206,7 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
                             <Eye className="w-3 h-3" />
                             Preview
                           </Button>
-                          
+
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -245,7 +222,8 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Delete QR Code</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete "{qrCode.title}"? This action cannot be undone.
+                                  Are you sure you want to delete "{qrCode.title}"? This action
+                                  cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -276,16 +254,14 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{selectedQR.title}</DialogTitle>
-              <DialogDescription>
-                QR Code Preview
-              </DialogDescription>
+              <DialogDescription>QR Code Preview</DialogDescription>
             </DialogHeader>
             <div className="flex justify-center py-4">
-              <div 
+              <div
                 className="border rounded-lg p-4 bg-muted/20"
-                style={{ 
-                  width: selectedQR.options.width, 
-                  height: selectedQR.options.height 
+                style={{
+                  width: selectedQR.options.width,
+                  height: selectedQR.options.height,
                 }}
               >
                 {/* QR code would be rendered here - for now showing placeholder */}
@@ -295,16 +271,10 @@ export default function QRHistory({ currentOptions, onLoadOptions }: QRHistoryPr
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                variant="outline" 
-                onClick={() => setSelectedQR(null)}
-              >
+              <Button variant="outline" onClick={() => setSelectedQR(null)}>
                 Close
               </Button>
-              <Button 
-                onClick={() => handleLoad(selectedQR)}
-                data-testid="button-load-from-preview"
-              >
+              <Button onClick={() => handleLoad(selectedQR)} data-testid="button-load-from-preview">
                 Load This QR Code
               </Button>
             </DialogFooter>

@@ -7,16 +7,16 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogDescription 
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -28,20 +28,20 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Bookmark, 
-  Save, 
-  Download, 
-  Trash2, 
-  Eye, 
-  Calendar, 
-  Users, 
+import {
+  Bookmark,
+  Save,
+  Download,
+  Trash2,
+  Eye,
+  Calendar,
+  Users,
   Layout,
   ExternalLink,
   Heart,
   Star,
   Globe,
-  Lock
+  Lock,
 } from 'lucide-react';
 import { usePersistence } from '@/contexts/PersistenceContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -53,30 +53,30 @@ interface QRTemplatesProps {
 }
 
 export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplatesProps) {
-  const { 
-    templates, 
+  const {
+    templates,
     publicTemplates,
-    saveTemplate, 
-    deleteTemplate, 
+    saveTemplate,
+    deleteTemplate,
     useTemplate,
-    isLoadingTemplates 
+    isLoadingTemplates,
   } = usePersistence();
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
   const [isPublicTemplate, setIsPublicTemplate] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<typeof templates[0] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<(typeof templates)[0] | null>(null);
 
   const handleSave = async () => {
     if (!templateName.trim()) return;
-    
+
     try {
       await saveTemplate(
-        templateName.trim(), 
-        templateDescription.trim() || '', 
-        currentOptions, 
+        templateName.trim(),
+        templateDescription.trim() || '',
+        currentOptions,
         isPublicTemplate
       );
       setTemplateName('');
@@ -96,9 +96,10 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
     }
   };
 
-  const handleUseTemplate = async (template: typeof templates[0]) => {
+  const handleUseTemplate = async (template: (typeof templates)[0]) => {
     try {
       // Track usage for analytics
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       await useTemplate(template.id);
       // Load the template configuration
       onLoadOptions(template.config);
@@ -129,12 +130,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
       {/* Save Template Dialog */}
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            data-testid="button-save-template"
-          >
+          <Button variant="outline" size="sm" className="gap-2" data-testid="button-save-template">
             <Bookmark className="w-4 h-4" />
             Save as Template
           </Button>
@@ -152,9 +148,9 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
               <Input
                 id="template-name"
                 value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
+                onChange={e => setTemplateName(e.target.value)}
                 placeholder="Enter a name for this template"
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSave()}
+                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSave()}
                 data-testid="input-template-name"
               />
             </div>
@@ -163,7 +159,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
               <Textarea
                 id="template-description"
                 value={templateDescription}
-                onChange={(e) => setTemplateDescription(e.target.value)}
+                onChange={e => setTemplateDescription(e.target.value)}
                 placeholder="Describe this template..."
                 rows={3}
                 data-testid="textarea-template-description"
@@ -185,8 +181,8 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
             <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={!templateName.trim()}
               data-testid="button-confirm-save-template"
             >
@@ -199,12 +195,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
       {/* Templates Gallery Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            data-testid="button-view-templates"
-          >
+          <Button variant="outline" size="sm" className="gap-2" data-testid="button-view-templates">
             <Layout className="w-4 h-4" />
             Templates
           </Button>
@@ -212,11 +203,9 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
         <DialogContent className="sm:max-w-4xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>QR Code Templates</DialogTitle>
-            <DialogDescription>
-              Browse and use pre-designed QR code templates.
-            </DialogDescription>
+            <DialogDescription>Browse and use pre-designed QR code templates.</DialogDescription>
           </DialogHeader>
-          
+
           <Tabs defaultValue="my-templates" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="my-templates" data-testid="tab-my-templates">
@@ -244,12 +233,15 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {templates.map((template) => (
+                    {templates.map(template => (
                       <Card key={template.id} className="hover-elevate">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <div className="space-y-1 flex-1">
-                              <CardTitle className="text-base" data-testid={`text-template-name-${template.id}`}>
+                              <CardTitle
+                                className="text-base"
+                                data-testid={`text-template-name-${template.id}`}
+                              >
                                 {template.name}
                               </CardTitle>
                               {template.description && (
@@ -260,7 +252,9 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Calendar className="w-3 h-3" />
                                 <span data-testid={`text-template-date-${template.id}`}>
-                                  {formatDistanceToNow(new Date(template.updatedAt), { addSuffix: true })}
+                                  {formatDistanceToNow(new Date(template.updatedAt), {
+                                    addSuffix: true,
+                                  })}
                                 </span>
                               </div>
                             </div>
@@ -290,7 +284,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                                 <ExternalLink className="w-3 h-3" />
                                 Use Template
                               </Button>
-                              
+
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -301,7 +295,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                                 <Eye className="w-3 h-3" />
                                 Preview
                               </Button>
-                              
+
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button
@@ -317,7 +311,8 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>Delete Template</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                                      Are you sure you want to delete "{template.name}"? This action
+                                      cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
@@ -354,12 +349,15 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {publicTemplates.map((template) => (
+                    {publicTemplates.map(template => (
                       <Card key={template.id} className="hover-elevate">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <div className="space-y-1 flex-1">
-                              <CardTitle className="text-base" data-testid={`text-public-template-name-${template.id}`}>
+                              <CardTitle
+                                className="text-base"
+                                data-testid={`text-public-template-name-${template.id}`}
+                              >
                                 {template.name}
                               </CardTitle>
                               {template.description && (
@@ -390,7 +388,7 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                                 <Download className="w-3 h-3" />
                                 Use Template
                               </Button>
-                              
+
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -420,11 +418,9 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{selectedTemplate.name}</DialogTitle>
-              <DialogDescription>
-                Template Preview
-              </DialogDescription>
+              <DialogDescription>Template Preview</DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               {selectedTemplate.description && (
                 <div>
@@ -432,13 +428,13 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                   <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
                 </div>
               )}
-              
+
               <div className="flex justify-center py-4">
-                <div 
+                <div
                   className="border rounded-lg p-4 bg-muted/20"
-                  style={{ 
-                    width: selectedTemplate.config.width, 
-                    height: selectedTemplate.config.height 
+                  style={{
+                    width: selectedTemplate.config.width,
+                    height: selectedTemplate.config.height,
                   }}
                 >
                   {/* QR code would be rendered here - for now showing placeholder */}
@@ -455,26 +451,32 @@ export default function QRTemplates({ currentOptions, onLoadOptions }: QRTemplat
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Visibility:</span>
-                  <Badge variant={selectedTemplate.isPublic ? "secondary" : "outline"} className="gap-1">
-                    {selectedTemplate.isPublic ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-                    {selectedTemplate.isPublic ? "Public" : "Private"}
+                  <Badge
+                    variant={selectedTemplate.isPublic ? 'secondary' : 'outline'}
+                    className="gap-1"
+                  >
+                    {selectedTemplate.isPublic ? (
+                      <Globe className="w-3 h-3" />
+                    ) : (
+                      <Lock className="w-3 h-3" />
+                    )}
+                    {selectedTemplate.isPublic ? 'Public' : 'Private'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Created:</span>
-                  <span>{formatDistanceToNow(new Date(selectedTemplate.createdAt), { addSuffix: true })}</span>
+                  <span>
+                    {formatDistanceToNow(new Date(selectedTemplate.createdAt), { addSuffix: true })}
+                  </span>
                 </div>
               </div>
             </div>
 
             <DialogFooter>
-              <Button 
-                variant="outline" 
-                onClick={() => setSelectedTemplate(null)}
-              >
+              <Button variant="outline" onClick={() => setSelectedTemplate(null)}>
                 Close
               </Button>
-              <Button 
+              <Button
                 onClick={() => handleUseTemplate(selectedTemplate)}
                 data-testid="button-use-from-preview"
               >

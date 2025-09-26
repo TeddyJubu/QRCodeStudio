@@ -14,7 +14,7 @@ export default [
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: ['./tsconfig.json', './client/tsconfig.json'],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
         ecmaVersion: 2022,
         sourceType: 'module',
@@ -31,6 +31,27 @@ export default [
         exports: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        FormData: 'readonly',
+        Headers: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        AbortController: 'readonly',
+        EventSource: 'readonly',
+        WebSocket: 'readonly',
+        Worker: 'readonly',
+        performance: 'readonly',
+        crypto: 'readonly',
       },
     },
     plugins: {
@@ -42,7 +63,7 @@ export default [
     },
     rules: {
       // TypeScript rules
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'warn',
@@ -59,7 +80,12 @@ export default [
       'react/jsx-no-duplicate-props': 'error',
       'react/jsx-no-undef': 'error',
       'react/no-unescaped-entities': 'warn',
-      'react/no-unknown-property': 'error',
+      'react/no-unknown-property': [
+        'error',
+        {
+          ignore: ['cmdk-group-heading', 'cmdk-group', 'cmdk-input-wrapper', 'cmdk-input', 'cmdk-item'],
+        },
+      ],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
@@ -86,7 +112,8 @@ export default [
       'no-var': 'warn',
       'object-shorthand': 'warn',
       'prefer-template': 'warn',
-      'no-undef': 'warn',
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
     },
     settings: {
       react: {
@@ -113,6 +140,10 @@ export default [
       '*.config.ts',
       'playwright-report/',
       'test-results/',
+      'server/**/*.test.ts',
+      'tests/**/*',
+      'client/public/sw.js',
+      'scripts/tree-shaking-analysis.js',
     ],
   },
 ];

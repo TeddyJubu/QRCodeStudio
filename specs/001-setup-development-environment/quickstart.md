@@ -183,6 +183,7 @@ open stats.html
 ### Common Issues
 
 **Node.js Version Issues**:
+
 ```bash
 # Check Node.js version
 node --version
@@ -192,6 +193,7 @@ nvm use 18
 ```
 
 **Dependency Issues**:
+
 ```bash
 # Clear node modules and reinstall
 rm -rf node_modules package-lock.json
@@ -199,6 +201,7 @@ npm install
 ```
 
 **Test Failures**:
+
 ```bash
 # Run tests with verbose output
 npm test -- --verbose
@@ -208,6 +211,7 @@ npm test -- QRCodeControls.test.tsx
 ```
 
 **Linting Errors**:
+
 ```bash
 # Auto-fix linting issues
 npm run lint:fix

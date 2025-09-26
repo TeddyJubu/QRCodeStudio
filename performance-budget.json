@@ -1,0 +1,114 @@
+{
+  "resourceSizes": [
+    {
+      "resourceType": "document",
+      "budget": 15,
+      "key": "Document Size"
+    },
+    {
+      "resourceType": "script",
+      "budget": 300,
+      "key": "Total JavaScript"
+    },
+    {
+      "resourceType": "image",
+      "budget": 200,
+      "key": "Total Images"
+    },
+    {
+      "resourceType": "stylesheet",
+      "budget": 100,
+      "key": "Total CSS"
+    },
+    {
+      "resourceType": "font",
+      "budget": 100,
+      "key": "Total Fonts"
+    },
+    {
+      "resourceType": "media",
+      "budget": 200,
+      "key": "Total Media"
+    },
+    {
+      "resourceType": "other",
+      "budget": 50,
+      "key": "Total Other"
+    },
+    {
+      "resourceType": "total",
+      "budget": 1000,
+      "key": "Total Page Size"
+    }
+  ],
+  "resourceCounts": [
+    {
+      "resourceType": "third-party",
+      "budget": 10,
+      "key": "Third-party Requests"
+    },
+    {
+      "resourceType": "total",
+      "budget": 50,
+      "key": "Total Requests"
+    }
+  ],
+  "timings": [
+    {
+      "metric": "first-contentful-paint",
+      "budget": 1800,
+      "key": "First Contentful Paint"
+    },
+    {
+      "metric": "largest-contentful-paint",
+      "budget": 2500,
+      "key": "Largest Contentful Paint"
+    },
+    {
+      "metric": "cumulative-layout-shift",
+      "budget": 0.1,
+      "key": "Cumulative Layout Shift"
+    },
+    {
+      "metric": "total-blocking-time",
+      "budget": 300,
+      "key": "Total Blocking Time"
+    },
+    {
+      "metric": "speed-index",
+      "budget": 3000,
+      "key": "Speed Index"
+    },
+    {
+      "metric": "interactive",
+      "budget": 3500,
+      "key": "Time to Interactive"
+    }
+  ],
+  "rules": [
+    {
+      "key": "performance-score",
+      "budget": 90,
+      "type": "score",
+      "description": "Lighthouse Performance Score"
+    },
+    {
+      "key": "accessibility-score",
+      "budget": 90,
+      "type": "score",
+      "description": "Lighthouse Accessibility Score"
+    },
+    {
+      "key": "best-practices-score",
+      "budget": 90,
+      "type": "score",
+      "description": "Lighthouse Best Practices Score"
+    },
+    {
+      "key": "seo-score",
+      "budget": 90,
+      "type": "score",
+      "description": "Lighthouse SEO Score"
+    }
+  ]
+}

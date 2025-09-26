@@ -1,0 +1,26 @@
+[
+  {
+    "resourceType": "script",
+    "budget": 300
+  },
+  {
+    "resourceType": "stylesheet",
+    "budget": 100
+  },
+  {
+    "resourceType": "image",
+    "budget": 200
+  },
+  {
+    "resourceType": "total",
+    "budget": 1000
+  },
+  {
+    "resourceType": "third-party",
+    "budget": 10
+  },
+  {
+    "resourceType": "document",
+    "budget": 50
+  }
+]

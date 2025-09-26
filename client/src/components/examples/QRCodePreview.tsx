@@ -8,29 +8,24 @@ export default function QRCodePreviewExample() {
     margin: 10,
     dotsOptions: {
       color: '#6366f1',
-      type: 'square' as const
+      type: 'square' as const,
     },
     backgroundOptions: {
-      color: '#ffffff'
+      color: '#ffffff',
     },
     cornersSquareOptions: {
       type: 'square' as const,
-      color: '#6366f1'
+      color: '#6366f1',
     },
     cornersDotOptions: {
       type: 'square' as const,
-      color: '#6366f1'
-    }
+      color: '#6366f1',
+    },
   };
 
   const handleDownload = (format: 'png' | 'jpeg' | 'svg') => {
     console.log(`Download triggered for format: ${format}`);
   };
 
-  return (
-    <QRCodePreview 
-      options={sampleOptions}
-      onDownload={handleDownload}
-    />
-  );
+  return <QRCodePreview options={sampleOptions} onDownload={handleDownload} />;
 }

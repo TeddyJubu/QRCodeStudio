@@ -4,7 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
@@ -25,7 +31,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
   const [useGradient, setUseGradient] = useState(false);
   const [stylingOpen, setStylingOpen] = useState(true);
   const [logoOpen, setLogoOpen] = useState(false);
-  
+
   // Dynamic QR state
   const [isDynamic, setIsDynamic] = useState(options.isDynamic || false);
   const [destinationUrl, setDestinationUrl] = useState(options.destinationUrl || '');
@@ -36,25 +42,25 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     setIsDynamic(options.isDynamic || false);
     setDestinationUrl(options.destinationUrl || '');
   }, [options.isDynamic, options.destinationUrl]);
-  
+
   // Content form states
   const [urlText, setUrlText] = useState('https://example.com');
   const [plainText, setPlainText] = useState('Hello World!');
   const [wifiData, setWifiData] = useState({
     ssid: '',
     password: '',
-    encryption: 'WPA'
+    encryption: 'WPA',
   });
   const [vcardData, setVcardData] = useState({
     firstName: '',
     lastName: '',
     phone: '',
-    email: ''
+    email: '',
   });
   const [emailData, setEmailData] = useState({
     email: '',
     subject: '',
-    body: ''
+    body: '',
   });
 
   const generateQRData = () => {
@@ -76,12 +82,10 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
   // Function to generate preview redirect URL for dynamic QRs
   const generatePreviewRedirect = async (destination: string): Promise<string> => {
     try {
-      const response = await apiRequest(
-        'POST',
-        '/api/qr-codes/preview-redirect',
-        { destinationUrl: destination }
-      );
-      
+      const response = await apiRequest('POST', '/api/qr-codes/preview-redirect', {
+        destinationUrl: destination,
+      });
+
       const data = await response.json();
       return data.redirectUrl;
     } catch (error) {
@@ -94,10 +98,11 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
   const updateQRData = async (explicitIsDynamic?: boolean, explicitDestinationUrl?: string) => {
     // Use explicit parameters if provided, otherwise fall back to current state
     const currentIsDynamic = explicitIsDynamic !== undefined ? explicitIsDynamic : isDynamic;
-    const currentDestinationUrl = explicitDestinationUrl !== undefined ? explicitDestinationUrl : destinationUrl;
-    
+    const currentDestinationUrl =
+      explicitDestinationUrl !== undefined ? explicitDestinationUrl : destinationUrl;
+
     let qrData;
-    
+
     if (currentIsDynamic && currentDestinationUrl) {
       // For dynamic QRs, get a real preview redirect URL from backend
       if (!previewRedirectUrl || explicitDestinationUrl !== undefined) {
@@ -111,12 +116,12 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
       qrData = generateQRData();
       setPreviewRedirectUrl(''); // Clear preview redirect URL for static QRs
     }
-    
-    onOptionsChange({ 
-      ...options, 
+
+    onOptionsChange({
+      ...options,
       data: qrData,
       isDynamic: currentIsDynamic,
-      destinationUrl: currentIsDynamic ? currentDestinationUrl : undefined
+      destinationUrl: currentIsDynamic ? currentDestinationUrl : undefined,
     });
   };
 
@@ -152,12 +157,12 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     const newOptions = { ...options };
     const keys = path.split('.');
     let current: any = newOptions;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       current = current[keys[i]];
     }
     current[keys[keys.length - 1]] = value;
-    
+
     onOptionsChange(newOptions);
   };
 
@@ -169,8 +174,8 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
         rotation: 0,
         colorStops: [
           { offset: 0, color: '#6366f1' },
-          { offset: 1, color: '#8b5cf6' }
-        ]
+          { offset: 1, color: '#8b5cf6' },
+        ],
       };
     } else {
       delete newOptions.dotsOptions.gradient;
@@ -182,11 +187,11 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const newOptions = { 
-          ...options, 
+      reader.onload = e => {
+        const newOptions = {
+          ...options,
           image: e.target?.result as string,
-          imageOptions: { crossOrigin: 'anonymous' as const, margin: 10 }
+          imageOptions: { crossOrigin: 'anonymous' as const, margin: 10 },
         };
         onOptionsChange(newOptions);
       };
@@ -214,7 +219,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
     } else if (contentType === 'email' && field) {
       setEmailData(prev => ({ ...prev, [field]: value }));
     }
-    
+
     // Update with a small delay to avoid too many updates
     setTimeout(async () => {
       await updateQRData();
@@ -229,20 +234,33 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
           <CardTitle className="text-lg">Content</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs value={contentType} onValueChange={(value) => {
-            setContentType(value as ContentType);
-            setTimeout(async () => {
-              await updateQRData();
-            }, 100);
-          }}>
+          <Tabs
+            value={contentType}
+            onValueChange={value => {
+              setContentType(value as ContentType);
+              setTimeout(async () => {
+                await updateQRData();
+              }, 100);
+            }}
+          >
             <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="url" data-testid="tab-url">URL</TabsTrigger>
-              <TabsTrigger value="text" data-testid="tab-text">Text</TabsTrigger>
-              <TabsTrigger value="wifi" data-testid="tab-wifi">WiFi</TabsTrigger>
-              <TabsTrigger value="vcard" data-testid="tab-vcard">vCard</TabsTrigger>
-              <TabsTrigger value="email" data-testid="tab-email">Email</TabsTrigger>
+              <TabsTrigger value="url" data-testid="tab-url">
+                URL
+              </TabsTrigger>
+              <TabsTrigger value="text" data-testid="tab-text">
+                Text
+              </TabsTrigger>
+              <TabsTrigger value="wifi" data-testid="tab-wifi">
+                WiFi
+              </TabsTrigger>
+              <TabsTrigger value="vcard" data-testid="tab-vcard">
+                vCard
+              </TabsTrigger>
+              <TabsTrigger value="email" data-testid="tab-email">
+                Email
+              </TabsTrigger>
             </TabsList>
-            
+
             {/* Dynamic QR Toggle - only show for URL content type */}
             {contentType === 'url' && (
               <div className="border rounded-lg p-4 bg-muted/30">
@@ -262,7 +280,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                     data-testid="switch-dynamic"
                   />
                 </div>
-                
+
                 {isDynamic && (
                   <div className="mt-4 space-y-2">
                     <Label htmlFor="destination-url">Destination URL</Label>
@@ -270,39 +288,40 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                       id="destination-url"
                       placeholder="https://example.com"
                       value={destinationUrl}
-                      onChange={(e) => handleDestinationUrlChange(e.target.value)}
+                      onChange={e => handleDestinationUrlChange(e.target.value)}
                       data-testid="input-destination-url"
                     />
                     <p className="text-xs text-muted-foreground">
-                      This is where the QR code will redirect. You can update this later without changing the QR code.
+                      This is where the QR code will redirect. You can update this later without
+                      changing the QR code.
                     </p>
                   </div>
                 )}
               </div>
             )}
-            
+
             <TabsContent value="url" className="space-y-2">
               <Label htmlFor="url-input">Website URL</Label>
               <Input
                 id="url-input"
                 placeholder="https://example.com"
                 value={urlText}
-                onChange={(e) => handleContentChange(e.target.value)}
+                onChange={e => handleContentChange(e.target.value)}
                 data-testid="input-url"
               />
             </TabsContent>
-            
+
             <TabsContent value="text" className="space-y-2">
               <Label htmlFor="text-input">Plain Text</Label>
               <Textarea
                 id="text-input"
                 placeholder="Enter any text..."
                 value={plainText}
-                onChange={(e) => handleContentChange(e.target.value)}
+                onChange={e => handleContentChange(e.target.value)}
                 data-testid="input-text"
               />
             </TabsContent>
-            
+
             <TabsContent value="wifi" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="wifi-ssid">Network Name (SSID)</Label>
@@ -310,7 +329,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   id="wifi-ssid"
                   placeholder="My WiFi Network"
                   value={wifiData.ssid}
-                  onChange={(e) => handleContentChange(e.target.value, 'ssid')}
+                  onChange={e => handleContentChange(e.target.value, 'ssid')}
                   data-testid="input-wifi-ssid"
                 />
               </div>
@@ -321,13 +340,16 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   type="password"
                   placeholder="WiFi Password"
                   value={wifiData.password}
-                  onChange={(e) => handleContentChange(e.target.value, 'password')}
+                  onChange={e => handleContentChange(e.target.value, 'password')}
                   data-testid="input-wifi-password"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wifi-encryption">Encryption</Label>
-                <Select value={wifiData.encryption} onValueChange={(value) => handleContentChange(value, 'encryption')}>
+                <Select
+                  value={wifiData.encryption}
+                  onValueChange={value => handleContentChange(value, 'encryption')}
+                >
                   <SelectTrigger data-testid="select-wifi-encryption">
                     <SelectValue />
                   </SelectTrigger>
@@ -339,7 +361,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                 </Select>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="vcard" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -348,7 +370,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                     id="vcard-firstname"
                     placeholder="John"
                     value={vcardData.firstName}
-                    onChange={(e) => handleContentChange(e.target.value, 'firstName')}
+                    onChange={e => handleContentChange(e.target.value, 'firstName')}
                     data-testid="input-vcard-firstname"
                   />
                 </div>
@@ -358,7 +380,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                     id="vcard-lastname"
                     placeholder="Doe"
                     value={vcardData.lastName}
-                    onChange={(e) => handleContentChange(e.target.value, 'lastName')}
+                    onChange={e => handleContentChange(e.target.value, 'lastName')}
                     data-testid="input-vcard-lastname"
                   />
                 </div>
@@ -369,7 +391,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   id="vcard-phone"
                   placeholder="+1234567890"
                   value={vcardData.phone}
-                  onChange={(e) => handleContentChange(e.target.value, 'phone')}
+                  onChange={e => handleContentChange(e.target.value, 'phone')}
                   data-testid="input-vcard-phone"
                 />
               </div>
@@ -380,12 +402,12 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   type="email"
                   placeholder="john@example.com"
                   value={vcardData.email}
-                  onChange={(e) => handleContentChange(e.target.value, 'email')}
+                  onChange={e => handleContentChange(e.target.value, 'email')}
                   data-testid="input-vcard-email"
                 />
               </div>
             </TabsContent>
-            
+
             <TabsContent value="email" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email-to">Email Address</Label>
@@ -394,7 +416,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   type="email"
                   placeholder="recipient@example.com"
                   value={emailData.email}
-                  onChange={(e) => handleContentChange(e.target.value, 'email')}
+                  onChange={e => handleContentChange(e.target.value, 'email')}
                   data-testid="input-email-to"
                 />
               </div>
@@ -404,7 +426,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   id="email-subject"
                   placeholder="Email subject"
                   value={emailData.subject}
-                  onChange={(e) => handleContentChange(e.target.value, 'subject')}
+                  onChange={e => handleContentChange(e.target.value, 'subject')}
                   data-testid="input-email-subject"
                 />
               </div>
@@ -414,7 +436,7 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                   id="email-body"
                   placeholder="Email message..."
                   value={emailData.body}
-                  onChange={(e) => handleContentChange(e.target.value, 'body')}
+                  onChange={e => handleContentChange(e.target.value, 'body')}
                   data-testid="input-email-body"
                 />
               </div>
@@ -430,7 +452,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
             <CardHeader className="cursor-pointer hover-elevate">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Styling Options</CardTitle>
-                <ChevronDown className={`w-4 h-4 transition-transform ${stylingOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${stylingOpen ? 'rotate-180' : ''}`}
+                />
               </div>
             </CardHeader>
           </CollapsibleTrigger>
@@ -447,13 +471,13 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                         id="foreground-color"
                         type="color"
                         value={options.dotsOptions.color}
-                        onChange={(e) => updateColor('dotsOptions.color', e.target.value)}
+                        onChange={e => updateColor('dotsOptions.color', e.target.value)}
                         className="w-12 h-10 p-1"
                         data-testid="input-foreground-color"
                       />
                       <Input
                         value={options.dotsOptions.color}
-                        onChange={(e) => updateColor('dotsOptions.color', e.target.value)}
+                        onChange={e => updateColor('dotsOptions.color', e.target.value)}
                         placeholder="#000000"
                         className="flex-1"
                       />
@@ -466,26 +490,26 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                         id="background-color"
                         type="color"
                         value={options.backgroundOptions.color}
-                        onChange={(e) => updateColor('backgroundOptions.color', e.target.value)}
+                        onChange={e => updateColor('backgroundOptions.color', e.target.value)}
                         className="w-12 h-10 p-1"
                         data-testid="input-background-color"
                       />
                       <Input
                         value={options.backgroundOptions.color}
-                        onChange={(e) => updateColor('backgroundOptions.color', e.target.value)}
+                        onChange={e => updateColor('backgroundOptions.color', e.target.value)}
                         placeholder="#ffffff"
                         className="flex-1"
                       />
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Gradient Option */}
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="use-gradient"
                     checked={useGradient}
-                    onCheckedChange={(checked) => {
+                    onCheckedChange={checked => {
                       setUseGradient(checked);
                       setTimeout(updateGradient, 100);
                     }}
@@ -498,9 +522,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
               {/* Dot Style */}
               <div className="space-y-2">
                 <Label htmlFor="dot-style">Dot Style</Label>
-                <Select 
-                  value={options.dotsOptions.type} 
-                  onValueChange={(value) => updateColor('dotsOptions.type', value)}
+                <Select
+                  value={options.dotsOptions.type}
+                  onValueChange={value => updateColor('dotsOptions.type', value)}
                 >
                   <SelectTrigger data-testid="select-dot-style">
                     <SelectValue />
@@ -519,9 +543,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="corner-square-style">Corner Square Style</Label>
-                  <Select 
-                    value={options.cornersSquareOptions.type} 
-                    onValueChange={(value) => updateColor('cornersSquareOptions.type', value)}
+                  <Select
+                    value={options.cornersSquareOptions.type}
+                    onValueChange={value => updateColor('cornersSquareOptions.type', value)}
                   >
                     <SelectTrigger data-testid="select-corner-square-style">
                       <SelectValue />
@@ -535,9 +559,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="corner-dot-style">Corner Dot Style</Label>
-                  <Select 
-                    value={options.cornersDotOptions.type} 
-                    onValueChange={(value) => updateColor('cornersDotOptions.type', value)}
+                  <Select
+                    value={options.cornersDotOptions.type}
+                    onValueChange={value => updateColor('cornersDotOptions.type', value)}
                   >
                     <SelectTrigger data-testid="select-corner-dot-style">
                       <SelectValue />
@@ -561,7 +585,9 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
             <CardHeader className="cursor-pointer hover-elevate">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Logo Options</CardTitle>
-                <ChevronDown className={`w-4 h-4 transition-transform ${logoOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${logoOpen ? 'rotate-180' : ''}`}
+                />
               </div>
             </CardHeader>
           </CollapsibleTrigger>
@@ -603,9 +629,11 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                       Remove
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="logo-margin">Logo Margin: {options.imageOptions?.margin || 10}px</Label>
+                    <Label htmlFor="logo-margin">
+                      Logo Margin: {options.imageOptions?.margin || 10}px
+                    </Label>
                     <Slider
                       id="logo-margin"
                       min={0}
@@ -615,10 +643,10 @@ export default function QRCodeControls({ options, onOptionsChange }: QRCodeContr
                       onValueChange={([value]) => {
                         const newOptions = {
                           ...options,
-                          imageOptions: { 
-                            crossOrigin: 'anonymous' as const, 
-                            margin: value 
-                          }
+                          imageOptions: {
+                            crossOrigin: 'anonymous' as const,
+                            margin: value,
+                          },
                         };
                         onOptionsChange(newOptions);
                       }}

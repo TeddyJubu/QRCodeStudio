@@ -1,0 +1,40 @@
+ci:
+  collect:
+    url:
+      - http://localhost:5173/
+    numberOfRuns: 3
+  assert:
+    assertions:
+      first-contentful-paint:
+        - error
+        - maxNumericValue: 1800
+      largest-contentful-paint:
+        - error
+        - maxNumericValue: 2500
+      cumulative-layout-shift:
+        - error
+        - maxNumericValue: 0.1
+      total-blocking-time:
+        - error
+        - maxNumericValue: 300
+      speed-index:
+        - error
+        - maxNumericValue: 3000
+      interactive:
+        - error
+        - maxNumericValue: 3500
+      performance:
+        - error
+        - minNumericValue: 0.9
+      accessibility:
+        - error
+        - minNumericValue: 0.9
+      best-practices:
+        - error
+        - minNumericValue: 0.9
+      seo:
+        - error
+        - minNumericValue: 0.9
+  upload:
+    target: filesystem
+    outputDir: ./lighthouse-reports

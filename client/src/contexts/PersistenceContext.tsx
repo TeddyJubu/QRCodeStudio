@@ -23,7 +23,12 @@ interface PersistenceContextType {
   // Templates
   templates: SavedTemplate[];
   publicTemplates: SavedTemplate[];
-  saveTemplate: (name: string, description: string, options: QRCodeOptions, isPublic?: boolean) => Promise<void>;
+  saveTemplate: (
+    name: string,
+    description: string,
+    options: QRCodeOptions,
+    isPublic?: boolean
+  ) => Promise<void>;
   deleteTemplate: (id: string) => Promise<void>;
   useTemplate: (templateId: string) => Promise<void>;
   isLoadingTemplates: boolean;
@@ -53,53 +58,45 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
   const queryClient = useQueryClient();
 
   // QR Codes Query
-  const { 
-    data: savedQRCodes = [], 
-    isLoading: isLoadingQRCodes 
-  } = useQuery({
+  const { data: savedQRCodes = [], isLoading: isLoadingQRCodes } = useQuery({
     queryKey: ['/api/qr-codes'],
-    select: (data: QrCode[]) => data.map(qr => ({
-      ...qr,
-      options: qr.options as QRCodeOptions
-    }))
+    select: (data: QrCode[]) =>
+      data.map(qr => ({
+        ...qr,
+        options: qr.options as QRCodeOptions,
+      })),
   });
 
   // Templates Queries
-  const { 
-    data: templates = [], 
-    isLoading: isLoadingUserTemplates 
-  } = useQuery({
+  const { data: templates = [], isLoading: isLoadingUserTemplates } = useQuery({
     queryKey: ['/api/templates'],
-    select: (data: Template[]) => data.map(template => ({
-      ...template,
-      config: template.options as QRCodeOptions
-    }))
+    select: (data: Template[]) =>
+      data.map(template => ({
+        ...template,
+        config: template.options as QRCodeOptions,
+      })),
   });
 
-  const { 
-    data: publicTemplates = []
-  } = useQuery({
+  const { data: publicTemplates = [] } = useQuery({
     queryKey: ['/api/templates', 'public'],
     queryFn: async () => {
       const res = await apiRequest('GET', '/api/templates?public=true');
       return await res.json();
     },
-    select: (data: Template[]) => data.map(template => ({
-      ...template,
-      config: template.options as QRCodeOptions
-    }))
+    select: (data: Template[]) =>
+      data.map(template => ({
+        ...template,
+        config: template.options as QRCodeOptions,
+      })),
   });
 
   const isLoadingTemplates = isLoadingUserTemplates;
 
   // User Preferences Query
-  const { 
-    data: preferences = null, 
-    isLoading: isLoadingPreferences 
-  } = useQuery({
+  const { data: preferences = null, isLoading: isLoadingPreferences } = useQuery({
     queryKey: ['/api/preferences'],
     retry: false, // Don't retry if preferences don't exist yet
-    select: (data: unknown) => data as UserPreferences | null
+    select: (data: unknown) => data as UserPreferences | null,
   });
 
   // Helper function to determine content type
@@ -118,7 +115,7 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
         title: name,
         data: options.data,
         contentType: getContentType(options.data),
-        options
+        options,
       });
       return await res.json();
     },
@@ -133,9 +130,9 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
       toast({
         title: 'Save Failed',
         description: 'Failed to save QR code. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const deleteQRCodeMutation = useMutation({
@@ -154,24 +151,29 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
       toast({
         title: 'Delete Failed',
         description: 'Failed to delete QR code. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   // Template Mutations
   const saveTemplateMutation = useMutation({
-    mutationFn: async ({ name, description, options, isPublic }: { 
-      name: string; 
-      description: string; 
-      options: QRCodeOptions; 
-      isPublic?: boolean; 
+    mutationFn: async ({
+      name,
+      description,
+      options,
+      isPublic,
+    }: {
+      name: string;
+      description: string;
+      options: QRCodeOptions;
+      isPublic?: boolean;
     }) => {
       const res = await apiRequest('POST', '/api/templates', {
         name,
         description,
         options: options,
-        isPublic: isPublic || false
+        isPublic: isPublic || false,
       });
       return await res.json();
     },
@@ -187,9 +189,9 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
       toast({
         title: 'Save Failed',
         description: 'Failed to save template. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const deleteTemplateMutation = useMutation({
@@ -209,9 +211,9 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
       toast({
         title: 'Delete Failed',
         description: 'Failed to delete template. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const useTemplateMutation = useMutation({
@@ -222,7 +224,7 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
     onSuccess: () => {
       // Refetch templates to update usage counts
       queryClient.invalidateQueries({ queryKey: ['/api/templates', 'public'] });
-    }
+    },
   });
 
   // User Preferences Mutations
@@ -236,7 +238,7 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
           theme: 'light',
           autoSave: false,
           defaultDownloadFormat: 'png',
-          ...updates
+          ...updates,
         });
         return await res.json();
       }
@@ -252,9 +254,9 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
       toast({
         title: 'Update Failed',
         description: 'Failed to update preferences. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const value: PersistenceContextType = {
@@ -271,7 +273,12 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
     // Templates
     templates,
     publicTemplates,
-    saveTemplate: async (name: string, description: string, options: QRCodeOptions, isPublic = false) => {
+    saveTemplate: async (
+      name: string,
+      description: string,
+      options: QRCodeOptions,
+      isPublic = false
+    ) => {
       await saveTemplateMutation.mutateAsync({ name, description, options, isPublic });
     },
     deleteTemplate: async (id: string) => {
@@ -287,12 +294,8 @@ export function PersistenceProvider({ children }: PersistenceProviderProps) {
     updatePreferences: async (updates: Partial<UserPreferences>) => {
       await updatePreferencesMutation.mutateAsync(updates);
     },
-    isLoadingPreferences
+    isLoadingPreferences,
   };
 
-  return (
-    <PersistenceContext.Provider value={value}>
-      {children}
-    </PersistenceContext.Provider>
-  );
+  return <PersistenceContext.Provider value={value}>{children}</PersistenceContext.Provider>;
 }

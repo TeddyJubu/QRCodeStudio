@@ -1,51 +1,66 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, jsonb, boolean, integer } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+import { sql } from 'drizzle-orm';
+import { pgTable, text, varchar, timestamp, jsonb, boolean, integer } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+export const users = pgTable('users', {
+  id: varchar('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  username: text('username').notNull().unique(),
+  password: text('password').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const qrCodes = pgTable("qr_codes", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  title: text("title").notNull(),
-  data: text("data").notNull(),
-  contentType: text("content_type").notNull(), // 'url', 'text', 'wifi', 'vcard', 'email'
-  options: jsonb("options").notNull(), // QR styling options
-  isDynamic: boolean("is_dynamic").default(false).notNull(),
-  shortUrl: text("short_url").unique(), // Unique short URL slug for dynamic QRs (e.g., abc123)
-  destinationUrl: text("destination_url"), // Actual destination for dynamic QRs
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const qrCodes = pgTable('qr_codes', {
+  id: varchar('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar('user_id')
+    .references(() => users.id)
+    .notNull(),
+  title: text('title').notNull(),
+  data: text('data').notNull(),
+  contentType: text('content_type').notNull(), // 'url', 'text', 'wifi', 'vcard', 'email'
+  options: jsonb('options').notNull(), // QR styling options
+  isDynamic: boolean('is_dynamic').default(false).notNull(),
+  shortUrl: text('short_url').unique(), // Unique short URL slug for dynamic QRs (e.g., abc123)
+  destinationUrl: text('destination_url'), // Actual destination for dynamic QRs
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const templates = pgTable("templates", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  name: text("name").notNull(),
-  description: text("description"),
-  options: jsonb("options").notNull(), // QR styling options template
-  isPublic: boolean("is_public").default(false).notNull(),
-  usageCount: integer("usage_count").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const templates = pgTable('templates', {
+  id: varchar('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar('user_id')
+    .references(() => users.id)
+    .notNull(),
+  name: text('name').notNull(),
+  description: text('description'),
+  options: jsonb('options').notNull(), // QR styling options template
+  isPublic: boolean('is_public').default(false).notNull(),
+  usageCount: integer('usage_count').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const userPreferences = pgTable("user_preferences", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").references(() => users.id).notNull().unique(),
-  defaultTemplate: varchar("default_template").references(() => templates.id),
-  theme: text("theme").default('light').notNull(), // 'light' or 'dark'
-  autoSave: boolean("auto_save").default(true).notNull(),
-  defaultDownloadFormat: text("default_download_format").default('png').notNull(), // 'png', 'jpeg', 'svg'
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const userPreferences = pgTable('user_preferences', {
+  id: varchar('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar('user_id')
+    .references(() => users.id)
+    .notNull()
+    .unique(),
+  defaultTemplate: varchar('default_template').references(() => templates.id),
+  theme: text('theme').default('light').notNull(), // 'light' or 'dark'
+  autoSave: boolean('auto_save').default(true).notNull(),
+  defaultDownloadFormat: text('default_download_format').default('png').notNull(), // 'png', 'jpeg', 'svg'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // Relations
@@ -87,31 +102,38 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertQrCodeSchema = createInsertSchema(qrCodes).omit({
-  id: true,
-  userId: true, // Server will set this based on authentication
-  shortUrl: true, // Server will generate this for dynamic QRs
-  createdAt: true,
-  updatedAt: true,
-}).refine((data) => {
-  // If dynamic, destinationUrl must be provided
-  if (data.isDynamic && !data.destinationUrl) {
-    return false;
-  }
-  return true;
-}, {
-  message: "destinationUrl is required for dynamic QR codes",
-  path: ["destinationUrl"],
-});
+export const insertQrCodeSchema = createInsertSchema(qrCodes)
+  .omit({
+    id: true,
+    userId: true, // Server will set this based on authentication
+    shortUrl: true, // Server will generate this for dynamic QRs
+    createdAt: true,
+    updatedAt: true,
+  })
+  .refine(
+    data => {
+      // If dynamic, destinationUrl must be provided
+      if (data.isDynamic && !data.destinationUrl) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'destinationUrl is required for dynamic QR codes',
+      path: ['destinationUrl'],
+    }
+  );
 
-export const updateQrCodeSchema = createInsertSchema(qrCodes).omit({
-  id: true,
-  userId: true, // Cannot change ownership
-  shortUrl: true, // Cannot change short URL slug once created
-  isDynamic: true, // Cannot change dynamic status after creation
-  createdAt: true,
-  updatedAt: true,
-}).partial();
+export const updateQrCodeSchema = createInsertSchema(qrCodes)
+  .omit({
+    id: true,
+    userId: true, // Cannot change ownership
+    shortUrl: true, // Cannot change short URL slug once created
+    isDynamic: true, // Cannot change dynamic status after creation
+    createdAt: true,
+    updatedAt: true,
+  })
+  .partial();
 
 export const insertTemplateSchema = createInsertSchema(templates).omit({
   id: true,
@@ -121,13 +143,15 @@ export const insertTemplateSchema = createInsertSchema(templates).omit({
   usageCount: true,
 });
 
-export const updateTemplateSchema = createInsertSchema(templates).omit({
-  id: true,
-  userId: true, // Cannot change ownership
-  createdAt: true,
-  updatedAt: true,
-  usageCount: true,
-}).partial();
+export const updateTemplateSchema = createInsertSchema(templates)
+  .omit({
+    id: true,
+    userId: true, // Cannot change ownership
+    createdAt: true,
+    updatedAt: true,
+    usageCount: true,
+  })
+  .partial();
 
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
   id: true,
@@ -136,12 +160,14 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).o
   updatedAt: true,
 });
 
-export const updateUserPreferencesSchema = createInsertSchema(userPreferences).omit({
-  id: true,
-  userId: true, // Cannot change ownership
-  createdAt: true,
-  updatedAt: true,
-}).partial();
+export const updateUserPreferencesSchema = createInsertSchema(userPreferences)
+  .omit({
+    id: true,
+    userId: true, // Cannot change ownership
+    createdAt: true,
+    updatedAt: true,
+  })
+  .partial();
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;

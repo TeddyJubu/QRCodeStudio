@@ -1,9 +1,9 @@
-import { 
-  users, 
-  qrCodes, 
-  templates, 
+import {
+  users,
+  qrCodes,
+  templates,
   userPreferences,
-  type User, 
+  type User,
   type InsertUser,
   type QrCode,
   type InsertQrCode,
@@ -13,10 +13,10 @@ import {
   type UpdateTemplate,
   type UserPreferences,
   type InsertUserPreferences,
-  type UpdateUserPreferences
-} from "@shared/schema";
-import { db } from "./db";
-import { eq, desc, and, or, sql } from "drizzle-orm";
+  type UpdateUserPreferences,
+} from '@shared/schema';
+import { db } from './db';
+import { eq, desc, and, or, sql } from 'drizzle-orm';
 
 export interface IStorage {
   // User methods
@@ -38,14 +38,24 @@ export interface IStorage {
   getPublicTemplates(): Promise<Template[]>;
   getTemplate(id: string): Promise<Template | undefined>;
   getTemplateForUser(id: string, userId: string): Promise<Template | undefined>;
-  updateTemplate(id: string, userId: string, updates: UpdateTemplate): Promise<Template | undefined>;
+  updateTemplate(
+    id: string,
+    userId: string,
+    updates: UpdateTemplate
+  ): Promise<Template | undefined>;
   deleteTemplate(id: string, userId: string): Promise<boolean>;
   incrementTemplateUsage(id: string): Promise<void>;
 
   // User Preferences methods
   getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
-  createUserPreferences(userId: string, preferences: InsertUserPreferences): Promise<UserPreferences>;
-  updateUserPreferences(userId: string, updates: UpdateUserPreferences): Promise<UserPreferences | undefined>;
+  createUserPreferences(
+    userId: string,
+    preferences: InsertUserPreferences
+  ): Promise<UserPreferences>;
+  updateUserPreferences(
+    userId: string,
+    updates: UpdateUserPreferences
+  ): Promise<UserPreferences | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -61,10 +71,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
@@ -76,7 +83,7 @@ export class DatabaseStorage implements IStorage {
         ...qrCode,
         userId,
         shortUrl: shortUrl || null,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .returning();
     return newQrCode;
@@ -106,12 +113,16 @@ export class DatabaseStorage implements IStorage {
     return qrCode || undefined;
   }
 
-  async updateQrCode(id: string, userId: string, updates: UpdateQrCode): Promise<QrCode | undefined> {
+  async updateQrCode(
+    id: string,
+    userId: string,
+    updates: UpdateQrCode
+  ): Promise<QrCode | undefined> {
     const [updatedQrCode] = await db
       .update(qrCodes)
       .set({
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(and(eq(qrCodes.id, id), eq(qrCodes.userId, userId)))
       .returning();
@@ -133,7 +144,7 @@ export class DatabaseStorage implements IStorage {
       .values({
         ...template,
         userId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .returning();
     return newTemplate;
@@ -165,20 +176,21 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(templates)
       .where(
-        and(
-          eq(templates.id, id),
-          or(eq(templates.isPublic, true), eq(templates.userId, userId))
-        )
+        and(eq(templates.id, id), or(eq(templates.isPublic, true), eq(templates.userId, userId)))
       );
     return template || undefined;
   }
 
-  async updateTemplate(id: string, userId: string, updates: UpdateTemplate): Promise<Template | undefined> {
+  async updateTemplate(
+    id: string,
+    userId: string,
+    updates: UpdateTemplate
+  ): Promise<Template | undefined> {
     const [updatedTemplate] = await db
       .update(templates)
       .set({
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(and(eq(templates.id, id), eq(templates.userId, userId)))
       .returning();
@@ -198,7 +210,7 @@ export class DatabaseStorage implements IStorage {
       .update(templates)
       .set({
         usageCount: sql`${templates.usageCount} + 1`,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(eq(templates.id, id));
   }
@@ -212,24 +224,30 @@ export class DatabaseStorage implements IStorage {
     return preferences || undefined;
   }
 
-  async createUserPreferences(userId: string, preferences: InsertUserPreferences): Promise<UserPreferences> {
+  async createUserPreferences(
+    userId: string,
+    preferences: InsertUserPreferences
+  ): Promise<UserPreferences> {
     const [newPreferences] = await db
       .insert(userPreferences)
       .values({
         ...preferences,
         userId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .returning();
     return newPreferences;
   }
 
-  async updateUserPreferences(userId: string, updates: UpdateUserPreferences): Promise<UserPreferences | undefined> {
+  async updateUserPreferences(
+    userId: string,
+    updates: UpdateUserPreferences
+  ): Promise<UserPreferences | undefined> {
     const [updatedPreferences] = await db
       .update(userPreferences)
       .set({
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(eq(userPreferences.userId, userId))
       .returning();

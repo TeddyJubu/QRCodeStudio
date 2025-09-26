@@ -172,20 +172,20 @@ components:
       properties:
         id:
           type: string
-          example: "unit-tests"
+          example: 'unit-tests'
         name:
           type: string
-          example: "Unit Tests"
+          example: 'Unit Tests'
         type:
           type: string
           enum: [unit, integration, e2e]
-          example: "unit"
+          example: 'unit'
         framework:
           type: string
-          example: "vitest"
+          example: 'vitest'
         configPath:
           type: string
-          example: "vitest.config.ts"
+          example: 'vitest.config.ts'
         coverageTarget:
           type: number
           minimum: 0
@@ -194,14 +194,14 @@ components:
         status:
           type: string
           enum: [passing, failing, pending]
-          example: "passing"
+          example: 'passing'
 
     TestExecution:
       type: object
       properties:
         suite:
           type: string
-          example: "unit"
+          example: 'unit'
         startTime:
           type: string
           format: date-time
@@ -272,7 +272,7 @@ components:
         overall:
           type: string
           enum: [passing, warning, failing]
-          example: "passing"
+          example: 'passing'
         tools:
           type: array
           items:
@@ -286,15 +286,15 @@ components:
       properties:
         name:
           type: string
-          example: "ESLint"
+          example: 'ESLint'
         type:
           type: string
           enum: [linter, formatter, type-checker]
-          example: "linter"
+          example: 'linter'
         status:
           type: string
           enum: [passing, warning, failing]
-          example: "passing"
+          example: 'passing'
         issues:
           type: array
           items:
@@ -305,7 +305,7 @@ components:
       properties:
         file:
           type: string
-          example: "src/components/QRCodeControls.tsx"
+          example: 'src/components/QRCodeControls.tsx'
         line:
           type: integer
           example: 25
@@ -314,14 +314,14 @@ components:
           example: 10
         rule:
           type: string
-          example: "react-hooks/exhaustive-deps"
+          example: 'react-hooks/exhaustive-deps'
         message:
           type: string
-          example: "React Hook useEffect has missing dependencies"
+          example: 'React Hook useEffect has missing dependencies'
         severity:
           type: string
           enum: [error, warning]
-          example: "warning"
+          example: 'warning'
 
     LintingResult:
       type: object
@@ -359,13 +359,13 @@ components:
       properties:
         name:
           type: string
-          example: "LCP"
+          example: 'LCP'
         value:
           type: number
           example: 2.5
         unit:
           type: string
-          example: "seconds"
+          example: 'seconds'
         target:
           type: number
           example: 2.5
@@ -375,7 +375,7 @@ components:
         status:
           type: string
           enum: [good, needs-improvement, poor]
-          example: "good"
+          example: 'good'
 
     PerformanceAudit:
       type: object
@@ -383,7 +383,7 @@ components:
         type:
           type: string
           enum: [lighthouse, web-vitals, bundle]
-          example: "lighthouse"
+          example: 'lighthouse'
         score:
           type: number
           minimum: 0
@@ -407,10 +407,10 @@ components:
       properties:
         id:
           type: string
-          example: "performance"
+          example: 'performance'
         title:
           type: string
-          example: "Performance"
+          example: 'Performance'
         score:
           type: number
           minimum: 0
@@ -422,10 +422,10 @@ components:
       properties:
         title:
           type: string
-          example: "Reduce initial server response time"
+          example: 'Reduce initial server response time'
         description:
           type: string
-          example: "The server responded slowly to the initial request"
+          example: 'The server responded slowly to the initial request'
         savings:
           type: object
           properties:
@@ -441,10 +441,10 @@ components:
       properties:
         title:
           type: string
-          example: "Ensure text remains visible during webfont load"
+          example: 'Ensure text remains visible during webfont load'
         description:
           type: string
-          example: "Font display strategies ensure text remains visible"
+          example: 'Font display strategies ensure text remains visible'
         score:
           type: number
           minimum: 0
@@ -457,7 +457,7 @@ components:
         overall:
           type: string
           enum: [healthy, degraded, failed]
-          example: "healthy"
+          example: 'healthy'
         workflows:
           type: array
           items:
@@ -471,11 +471,11 @@ components:
       properties:
         name:
           type: string
-          example: "Test"
+          example: 'Test'
         status:
           type: string
           enum: [success, failure, pending, running]
-          example: "success"
+          example: 'success'
         lastRun:
           type: string
           format: date-time
@@ -485,7 +485,7 @@ components:
         url:
           type: string
           format: uri
-          example: "https://github.com/owner/repo/actions/runs/123456789"
+          example: 'https://github.com/owner/repo/actions/runs/123456789'
 
 tags:
   - name: Testing
