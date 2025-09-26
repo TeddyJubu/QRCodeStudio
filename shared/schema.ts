@@ -18,6 +18,9 @@ export const qrCodes = pgTable("qr_codes", {
   data: text("data").notNull(),
   contentType: text("content_type").notNull(), // 'url', 'text', 'wifi', 'vcard', 'email'
   options: jsonb("options").notNull(), // QR styling options
+  isDynamic: boolean("is_dynamic").default(false).notNull(),
+  shortUrl: text("short_url").unique(), // Unique short URL slug for dynamic QRs (e.g., abc123)
+  destinationUrl: text("destination_url"), // Actual destination for dynamic QRs
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -87,13 +90,25 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertQrCodeSchema = createInsertSchema(qrCodes).omit({
   id: true,
   userId: true, // Server will set this based on authentication
+  shortUrl: true, // Server will generate this for dynamic QRs
   createdAt: true,
   updatedAt: true,
+}).refine((data) => {
+  // If dynamic, destinationUrl must be provided
+  if (data.isDynamic && !data.destinationUrl) {
+    return false;
+  }
+  return true;
+}, {
+  message: "destinationUrl is required for dynamic QR codes",
+  path: ["destinationUrl"],
 });
 
 export const updateQrCodeSchema = createInsertSchema(qrCodes).omit({
   id: true,
   userId: true, // Cannot change ownership
+  shortUrl: true, // Cannot change short URL slug once created
+  isDynamic: true, // Cannot change dynamic status after creation
   createdAt: true,
   updatedAt: true,
 }).partial();
