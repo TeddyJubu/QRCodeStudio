@@ -28,6 +28,7 @@ export interface IStorage {
   createQrCode(userId: string, qrCode: InsertQrCode): Promise<QrCode>;
   getQrCodesByUser(userId: string): Promise<QrCode[]>;
   getQrCode(id: string, userId: string): Promise<QrCode | undefined>;
+  getQrCodeByShortUrl(shortUrl: string): Promise<QrCode | undefined>;
   updateQrCode(id: string, userId: string, updates: UpdateQrCode): Promise<QrCode | undefined>;
   deleteQrCode(id: string, userId: string): Promise<boolean>;
 
@@ -93,6 +94,14 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(qrCodes)
       .where(and(eq(qrCodes.id, id), eq(qrCodes.userId, userId)));
+    return qrCode || undefined;
+  }
+
+  async getQrCodeByShortUrl(shortUrl: string): Promise<QrCode | undefined> {
+    const [qrCode] = await db
+      .select()
+      .from(qrCodes)
+      .where(and(eq(qrCodes.shortUrl, shortUrl), eq(qrCodes.isDynamic, true)));
     return qrCode || undefined;
   }
 

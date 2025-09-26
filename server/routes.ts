@@ -15,6 +15,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // TODO: Replace with real authentication once implemented
   const getMockUserId = (): string => "demo-user-id";
 
+  // Dynamic QR Code redirect route
+  app.get("/r/:shortUrl", async (req, res) => {
+    try {
+      const shortUrl = req.params.shortUrl;
+      const qrCode = await storage.getQrCodeByShortUrl(shortUrl);
+      
+      if (!qrCode || !qrCode.isDynamic || !qrCode.destinationUrl) {
+        return res.status(404).json({ error: "QR code not found or invalid" });
+      }
+      
+      // Redirect to the destination URL
+      res.redirect(302, qrCode.destinationUrl);
+    } catch (error) {
+      console.error("Error handling redirect:", error);
+      res.status(500).json({ error: "Failed to process redirect" });
+    }
+  });
+
   // QR Code routes
   app.get("/api/qr-codes", async (req, res) => {
     try {
